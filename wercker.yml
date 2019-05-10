@@ -1,0 +1,78 @@
+box: 
+  id: golang
+  ports:
+    - "3001"
+
+dev:
+  steps:
+    - setup-go-workspace:
+        package-dir: github.com/alai04/backing-fulfillment
+
+    - script:
+        name: env
+        code: env
+
+    - script:
+        name: go get
+        code: |
+          cd $WERCKER_SOURCE_DIR
+          go version
+          export GO111MODULE=on
+          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+
+    - internal/watch:
+        code: go run main.go
+        reload: true
+
+build:
+  steps:
+    - setup-go-workspace:
+        package-dir: github.com/alai04/backing-fulfillment
+
+    - script:
+        name: env
+        code: env
+
+    - script:
+        name: go get
+        code: |
+          cd $WERCKER_SOURCE_DIR
+          go version
+          export GO111MODULE=on
+          export PATH=$WERCKER_SOURCE_DIR/bin:$PATH
+          go mod tidy
+
+    # Build the project
+    - script:
+        name: go build
+        code: |
+          go build
+
+    # Test the project
+    - script:
+        name: go test
+        code: |
+          go test -v ./...
+
+    - script:
+        name: copy files to wercker output
+        code: |
+          cp -R ./ ${WERCKER_OUTPUT_DIR}
+
+# deploy:
+#   steps:
+#     - heroku-deploy:
+#         key: $HEROKU_KEY
+#         user: $HEROKU_USER
+#         app-name: $HEROKU_APP_NAME
+
+# docker:
+#   steps:
+#     - internal/docker-push:
+#         username: $DOCKER_USERNAME
+#         password: $DOCKER_PASSWORD
+#         cmd: /pipeline/source/hello
+#         port: "8080"
+#         tag: latest
+#         repository: alai04/book-hello
+#         registry: https://registry.hub.docker.com
