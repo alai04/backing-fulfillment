@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+backing-fulfillment
 
 # Test binary, build with `go test -c`
 *.test
